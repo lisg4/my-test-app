@@ -1,26 +1,35 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import react,{ useState, useCallback, memo } from 'react'
+import { Button } from 'antd'
+import './App.css'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+//子组件会有不必要渲染的例子
+interface ChildProps {
+  name: string;
+  count: number;
+  onClick: Function;
+}
+const Child = ({ name, onClick}: ChildProps): JSX.Element => {
+  console.log('子组件?')
+  return(
+      <>
+          <div>我是一个子组件，父级传过来的数据：{name}</div>
+          <Button type='primary' onClick={onClick.bind(null, '新的子组件name')}>改变name</Button>
+      </>
   );
 }
+const ChildMemo = memo(Child);
 
-export default App;
+const Page = (props: any) => {
+  const [count, setCount] = useState(0);
+  const [name, setName] = useState('Child组件');
+
+  return (
+      <div className='page'>
+          <Button type='primary' onClick={(e) => { setCount(count+1) }}>加1</Button>
+          <p>count:{count}</p>
+          <ChildMemo name={name} count={count} onClick={useCallback((newName: string) => setName(newName), [])}/>
+      </div>
+  )
+}
+
+export default Page
