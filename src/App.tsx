@@ -1,35 +1,39 @@
-import react,{ useState, useCallback, memo } from 'react'
+import react,{ useState, useCallback, memo, useRef, useMemo, useEffect } from 'react'
+import React from 'react';
+import ReactDOM from 'react-dom';
 import { Button } from 'antd'
 import './App.css'
+import logo from './logo.svg'
 
 //子组件会有不必要渲染的例子
 interface ChildProps {
   name: string;
-  count: number;
+  count?: number;
   onClick: Function;
 }
-const Child = ({ name, onClick}: ChildProps): JSX.Element => {
-  console.log('子组件?')
+const Child = ({ name, onClick}: ChildProps) => {
   return(
       <>
-          <div>我是一个子组件，父级传过来的数据：{name}</div>
+          <div>传递过来的数据：{name}</div>
           <Button type='primary' onClick={onClick.bind(null, '新的子组件name')}>改变name</Button>
       </>
   );
 }
 const ChildMemo = memo(Child);
 
-const Page = (props: any) => {
+const Page = () => {
   const [count, setCount] = useState(0);
   const [name, setName] = useState('Child组件');
+  const countRef = useRef<number>(0)
+  const memoParams = useMemo(() => name,[name])
 
   return (
       <div className='page'>
-          <Button type='primary' onClick={(e) => { setCount(count+1) }}>加1</Button>
+          <Button type='primary' onClick={() => {setCount(count+1);countRef.current = countRef.current + 1} }>加1</Button>
+          <Button style={{marginLeft: '20px'}} type='primary' onClick={() => setTimeout(() =>{alert(countRef.current)},2000)}>获取count</Button>
           <p>count:{count}</p>
-          <ChildMemo name={name} count={count} onClick={useCallback((newName: string) => setName(newName), [])}/>
+          <ChildMemo name={memoParams} onClick={useCallback((newName: string) => setName(newName), [])}/>
       </div>
   )
 }
-
 export default Page
